@@ -1,5 +1,4 @@
-/** includes **/
-#include <ctype.h>
+/** includes **/ #include <ctype.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,6 +14,9 @@ struct termios orig_termios;
 /** terminal **/
 
 void die(const char *s) {
+  write(STDOUT_FILENO, "\x1b[2J", 4);
+  write(STDOUT_FILENO, "\x1b[H", 3);
+
   perror(s);
   exit(1);
 }
@@ -49,6 +51,13 @@ char editorReadKey(void) {
   return c;
 }
 
+/** output **/
+
+void editorRefreshScreen(void) {
+  write(STDOUT_FILENO, "\x1b[2J", 4);
+  write(STDOUT_FILENO, "\x1b[H", 3);
+}
+
 /** input **/
 
 void editorProcessKeyPress(void) {
@@ -56,6 +65,8 @@ void editorProcessKeyPress(void) {
 
   switch (c) {
     case CTRL_KEY('q'):
+      write(STDOUT_FILENO, "\x1b[2J", 4);
+      write(STDOUT_FILENO, "\x1b[H", 3);
       exit(0);
       break;
   }
@@ -67,6 +78,7 @@ int main(void) {
   enableRawMode();
 
   while (1) {
+    editorRefreshScreen();
     editorProcessKeyPress();
   }
   return 0;
